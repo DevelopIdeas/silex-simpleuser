@@ -35,6 +35,7 @@ class Mailer
 {
     const ROUTE_CONFIRM_EMAIL = 'user.confirm-email';
     const ROUTE_RESET_PASSWORD = 'user.reset-password';
+    const ROUTE_LOGIN = 'user.login';
 
     /** @var \Swift_Mailer */
     protected $mailer;
@@ -51,6 +52,7 @@ class Mailer
     protected $fromAddress;
     protected $fromName;
     protected $confirmationTemplate;
+    protected $manualUserTemplate;
     protected $resetTemplate;
     protected $resetTokenTtl = 86400;
 
@@ -75,6 +77,22 @@ class Mailer
     public function getConfirmationTemplate()
     {
         return $this->confirmationTemplate;
+    }
+
+    /**
+     * @param string $manualUserTemplate
+     */
+    public function setManualUserTemplate($manualUserTemplate)
+    {
+        $this->manualUserTemplate = $manualUserTemplate;
+    }
+
+    /**
+     * @return string
+     */
+    public function getManualUserTemplate()
+    {
+        return $this->manualUserTemplate;
     }
 
     /**
@@ -143,7 +161,7 @@ class Mailer
 
     public function sendConfirmationMessage(User $user)
     {
-        $url = $this->urlGenerator->generate(self::ROUTE_CONFIRM_EMAIL, array('token' => $user->getConfirmationToken()), true);
+        $url = $this->urlGenerator->generate(self::ROUTE_CONFIRM_EMAIL, array('token' => $user->getConfirmationToken()), UrlGeneratorInterface::ABSOLUTE_URL);
 
         $context = array(
             'user' => $user,
@@ -153,9 +171,21 @@ class Mailer
         $this->sendMessage($this->confirmationTemplate, $context, $this->getFromEmail(), $user->getEmail());
     }
 
+    public function sendManualUserPasswordMessage(User $user, $password)
+    {
+        $url = $this->urlGenerator->generate(self::ROUTE_LOGIN, array('password' => $password), UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $context = array(
+            'url' => $url,
+            'password' => $password
+        );
+
+        $this->sendMessage($this->manualUserTemplate, $context, $this->getFromEmail(), $user->getEmail());
+    }
+
     public function sendResetMessage(User $user)
     {
-        $url = $this->urlGenerator->generate(self::ROUTE_RESET_PASSWORD, array('token' => $user->getConfirmationToken()), true);
+        $url = $this->urlGenerator->generate(self::ROUTE_RESET_PASSWORD, array('token' => $user->getConfirmationToken()), UrlGeneratorInterface::ABSOLUTE_URL);
 
         $context = array(
             'user' => $user,
@@ -214,7 +244,7 @@ class Mailer
             $message->setBody($textBody);
         }
 
-        $this->mailer->send($message);
+        $resp = $this->mailer->send($message);
     }
 
     /**

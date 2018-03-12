@@ -116,7 +116,8 @@ class UserController
                     $app['session']->getFlashBag()->set('alert', 'Account created.');
 
                     // Redirect to user's new profile page.
-                    return $app->redirect($app['url_generator']->generate('user.view', array('id' => $user->getId())));
+                    // return $app->redirect($app['url_generator']->generate('user.view', array('id' => $user->getId())));
+                    return $app->redirect($app['url_generator']->generate('home'));
                 }
 
             } catch (InvalidArgumentException $e) {
@@ -145,7 +146,7 @@ class UserController
      */
     public function confirmEmailAction(Application $app, Request $request, $token)
     {
-        $user = $this->userManager->findOneBy(array('confirmationToken' => $token));
+        $user = $this->userManager->findOneBy(array('customFields' => array('su:confirmationToken' => $token)));
         if (!$user) {
             $app['session']->getFlashBag()->set('alert', 'Sorry, your email confirmation link has expired.');
 
@@ -288,7 +289,7 @@ class UserController
 
         $tokenExpired = false;
 
-        $user = $this->userManager->findOneBy(array('confirmationToken' => $token));
+        $user = $this->userManager->findOneBy(array('customFields' => array('su:confirmationToken' => $token)));
         if (!$user) {
             $tokenExpired = true;
         } else if ($user->isPasswordResetRequestExpired($app['user.options']['passwordReset']['tokenTTL'])) {
@@ -485,7 +486,6 @@ class UserController
     {
         $this->editCustomFields = $editCustomFields;
     }
-
 
     public function listAction(Application $app, Request $request)
     {
