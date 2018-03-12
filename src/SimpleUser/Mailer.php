@@ -173,7 +173,7 @@ class Mailer
 
     public function sendManualUserPasswordMessage(User $user, $password)
     {
-        $url = $this->urlGenerator->generate(self::ROUTE_LOGIN, array('password' => $password), UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->urlGenerator->generate(self::ROUTE_LOGIN, array(), UrlGeneratorInterface::ABSOLUTE_URL);
 
         $context = array(
             'url' => $url,
