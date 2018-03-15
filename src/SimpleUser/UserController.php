@@ -283,6 +283,8 @@ class UserController
      */
     public function resetPasswordAction(Application $app, Request $request, $token)
     {
+        $isCreate = $request->query->get('create') == 1;
+        
         if (!$this->isPasswordResetEnabled()) {
             throw new NotFoundHttpException('Password resetting is not enabled.');
         }
@@ -328,6 +330,7 @@ class UserController
             'layout_template' => $this->getTemplate('layout'),
             'user' => $user,
             'token' => $token,
+            'is_create' => $isCreate,
             'error' => $error,
         ));
     }
