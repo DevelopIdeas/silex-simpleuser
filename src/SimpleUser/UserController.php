@@ -323,7 +323,8 @@ class UserController
 
                 $app['session']->getFlashBag()->set('alert', 'Your password has been reset and you are now signed in.');
 
-                return $app->redirect($app['url_generator']->generate('user.view', array('id' => $user->getId())));
+                // return $app->redirect($app['url_generator']->generate('user.view', array('id' => $user->getId())));
+                return $app->redirect($app['url_generator']->generate('home'));
             }
         }
 
